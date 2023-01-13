@@ -1,7 +1,7 @@
-#Starting the project
+# Starting the project
 Preparing the structure and organizing the project.
 
-## Installation
+## Environment Installation
 ### With Conda
 Creating a conda environment:
 ```
@@ -23,6 +23,8 @@ conda deactivate
 
 
 ## GIT
+As a version control system and sharing files/projects.
+
 ### Configure Git
 Repo: https://github.com/vmaiol/aidl-final-project
 
