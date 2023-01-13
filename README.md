@@ -51,10 +51,20 @@ In terminal:
 ssh-keygen
 ```
 And then:
-- Go to the project homepage or section.
-- Code, SSH, Add a new public key
+- Go to the project homepage or section in Github.
+- Code -> SSH -> Add a new public key
 - New Key
 - We copy paste the public key that is inside the file we have just created ended with .pub and that was created in our laptop when "ssh-keygen".
+- !!!!! By default, I think the SSH connection to Github from our laptop, uses a file called id_rsa (if you use Mac, it is inside /Users/--user-name--/.ssh/). In my case, as I already have another SHH key in that file and I didn't want to override it, I saved the keys in another filename (in the ssh-keygen process it asks for it). Then, you need to create a configuration file where you specify which file to read every time you try to connect to X host via SSH, in this case Github. Like this:
+```
+Host github.com
+ HostName github.com
+ IdentityFile ~/.ssh/aidl_final_project_github
+ ```
+ - The connection can be tested like this:
+```
+ ssh -vT git@github.com
+```
 
 ### Cloning the repository (ssh)
 ```
