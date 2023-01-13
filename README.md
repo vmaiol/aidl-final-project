@@ -134,9 +134,21 @@ For example, to push your local commits to the main branch of the origin remote:
 git push origin main
 ```
 
+If we want to create a branch:
+```
+git branch -M master-maiol-v2
+```
+
+A common process could be:
+```
+git init
+git remote add origin git@gitlab.com:username/projectpath.git
+git branch -M master-v2
+git add .
+git commit -m 'Maiol: My first commit'
+git push -u origin master-v2
+```
+
 ### Ignoring files/folders for the commit
-As it is is quite "personal" and has many combinations/possibilities, I leave here a basic "quick read" guide to implement .gitignore:
+As it is quite "personal" and has many combinations/possibilities, I leave here a basic "quick read" guide to implement .gitignore:
 https://www.freecodecamp.org/news/gitignore-file-how-to-ignore-files-and-folders-in-git/
-
-
-For more "general" detailed info -> https://docs.gitlab.com/ee/gitlab-basics/start-using-git.html
