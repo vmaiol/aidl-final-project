@@ -1,6 +1,7 @@
 # Starting the project
 Preparing the structure and organizing the project.
 
+
 ## Environment Installation
 ### With Conda
 Creating a conda environment:
@@ -56,7 +57,7 @@ And then:
 - Go to the project homepage or section in Github.
 - Code -> SSH -> Add a new public key
 - New Key
-- We copy paste the public key that is inside the file we have just created ended with .pub and that was created in our laptop when "ssh-keygen".
+- We copy paste the public key that is inside the file we have just created, ended with .pub and that was created in our laptop when "ssh-keygen".
 - !!!!! By default, I think the SSH connection to Github from our laptop, uses a file called id_rsa (if you use Mac, it is inside /Users/--user-name--/.ssh/). In my case, as I already have another SHH key in that file and I didn't want to override it, I saved the keys in another filename (in the ssh-keygen process it asks for it). Then, you need to create a configuration file where you specify which file to read every time you try to connect to X host via SSH, in this case Github. Like this:
 ```
 Host github.com
@@ -70,7 +71,7 @@ Host github.com
 
 ### Cloning the repository (ssh)
 ```
-git clone git@gitlab.com:gitlab-tests/sample-project.git
+git clone git@github.com:github-tests/sample-project.git
 ```
 
 ### Convert a local directory into a repository
@@ -79,10 +80,10 @@ Initialize a local folder so Git tracks it as a repository
 git init
 ```
 
-Adding a “remote” to tell Git which remote repository in GitLab is tied to the specific local folder.
+Adding a “remote” to tell Git which remote repository in Github is tied to the specific local folder.
 In the directory you’ve initialized
 ```
-git remote add origin git@gitlab.com:username/projectpath.git
+git remote add origin git@github.com:username/projectpath.git
 ```
 
 To view remote repositories:
@@ -144,7 +145,7 @@ git branch -M master-maiol-v2
 A common process could be:
 ```
 git init
-git remote add origin git@gitlab.com:username/projectpath.git
+git remote add origin git@github.com:username/projectpath.git
 git branch -M master-v2
 git add .
 git commit -m 'Maiol: My first commit'
