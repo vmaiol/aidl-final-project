@@ -22,7 +22,7 @@ To stop/deactivate the environment:
 conda deactivate
 ```
 
-Execute basic structure to check that minimums has been installed. In folder's projects:
+Execute basic structure to check that minimums have been installed. In the project folder:
 ```
 python main.py
 ```
