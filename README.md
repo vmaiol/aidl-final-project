@@ -22,6 +22,11 @@ To stop/deactivate the environment:
 conda deactivate
 ```
 
+Execute basic structure to check that minimums has been installed. In folder's projects:
+```
+python main.py
+```
+
 
 ## GIT
 As a version control system and sharing files/projects.
@@ -150,6 +155,13 @@ git branch -M master-v2
 git add .
 git commit -m 'Maiol: My first commit'
 git push -u origin master-v2
+```
+
+or directly:
+```
+git add .
+git commit -a -m 'Maiol: My first commit'
+git push -u origin ---branch_name---
 ```
 
 ### Ignoring files/folders for the commit
