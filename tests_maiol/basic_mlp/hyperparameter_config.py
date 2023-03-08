@@ -37,23 +37,19 @@ def load_hyper_conf(config_owner, config_type, config_search):
                     "img_size": tune.grid_search([16, 32, 64, 128]),
                     "img_vars" : tune.choice([1]),
                     "train_batch_size": tune.grid_search([64, 128]),
-                    "val_batch_size": tune.grid_search([64, 128]),
                     "n_epochs": tune.choice([50]),
-                    #"l1": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
-                    "l2": tune.sample_from(lambda _: 2**np.random.randint(2, 9)), #weight_decay
+                    "l2": tune.loguniform(1e-5, 1),
                     "lr": tune.loguniform(1e-4, 1e-1),
                 }
 
             elif config_search =='random_search':
                 #EN EL RANDOM SEARCH TIENE VALOR EL NUM DE SAMPLES!!
                 config = {
-                    "img_size": tune.grid_search([64]),
+                    "img_size": tune.grid_search([16,32,64]),
                     "img_vars" : tune.choice([1]),
-                    "train_batch_size": tune.choice([16, 32, 64]),
-                    "val_batch_size": tune.choice([64]),
+                    "train_batch_size": tune.choice([64, 128]),
                     "n_epochs": tune.choice([20]),
-                    #"l1": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
-                    "l2": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
+                    "l2": tune.loguniform(1e-5, 1),
                     "lr": tune.loguniform(1e-4, 1e-1),
                 }
             elif config_search == "other":
@@ -63,10 +59,10 @@ def load_hyper_conf(config_owner, config_type, config_search):
                     "img_size": tune.grid_search([64]),
                     "img_vars" : tune.choice([1]),
                     "train_batch_size": tune.choice([64]),
-                    "val_batch_size": tune.choice([64]),
                     "n_epochs": tune.choice([50]),
                     #"l1": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
-                    "l2": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
+                    #"l2": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
+                    "l2": tune.loguniform(1e-5, 1),
                     "lr": tune.loguniform(1e-4, 1e-1),
                 }
 
