@@ -55,12 +55,12 @@ def create_dataloader(config, sets):
     train_loader = torch.utils.data.DataLoader(
         trainset,
         batch_size=config['train_batch_size'],
-        shuffle=False)
+        shuffle=True)
 
     val_loader = torch.utils.data.DataLoader(
         valset,
         batch_size=config['val_batch_size'],
-        shuffle=False)
+        shuffle=True)
 
     #NO HACE FALTA HACER EL DATALOADER DEL TEST, YA QUE CON LA MEJOR CONFIG ENTRENADA EN TRAIN Y VAL, DECIDIREMOS QUE BATCH utilizar
     #test_loader = torch.utils.data.DataLoader(
@@ -199,12 +199,14 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
             data = data.view(batch_size, -1)
             target = target.unsqueeze(1)
             data, target = data.to(device), target.to(device)
-
+            #print("target:")
+            #print(target)
             output = model(data)
+            #print("output")
+            #print(output)
+            loss_test += loss_fn(output, target)
 
-            loss = loss_fn(output, target)
-
-            loss_test += loss.item()
+            #loss_test += loss.item()
 
     loss_stats['test'].append(loss_test/len(test_loader)) #for each epoch
 
@@ -306,7 +308,7 @@ def main():
     #print(best_trial)
     print("Best config: {}".format(best_trial.config))
     best_config = best_trial.config
-    print("Best validation loss: {}".format(best_trial.last_result["val_loss"]))
+    #print("Best validation loss: {}".format(best_trial.last_result["val_loss"]))
     dir_best_results = results.best_logdir #lo utilizaremos para cargar el modelo guardado
     dir_best_results_model = dir_best_results+"/mlp_model.pth"
     #print(dir_best_results_model)
