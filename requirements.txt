@@ -2,3 +2,13 @@ matplotlib
 numpy
 Pillow
 torch
+ray
+ray[tune]
+ray[default]
+aiohttp==3.7.4
+torchvision
+pandas
+opencv-python
+torchmetrics
+scikit-learn
+seaborn
