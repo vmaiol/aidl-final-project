@@ -45,7 +45,7 @@ class BasicMlp(nn.Module):
                 idx += 1
                 layers_dict[str(idx)] = nn.ReLU()
             else:
-                layers_dict[str(idx)] = nn.Linear(layer[0],layer[1]) #sin Relu para hacerlo lineal
+                layers_dict[str(idx)] = nn.Linear(layer[0],layer[1]) #sin activacion fn para hacerlo lineal
             idx += 1
             idx_aux += 1
 

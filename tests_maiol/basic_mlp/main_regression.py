@@ -191,13 +191,20 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
     model.eval()
     loss_test = 0
     epoch_loss = 0
-
+    #print("----------------------------------")
+    #print(len(test_loader))
     with torch.no_grad():
         loss_train = 0.0
         for batch_idx, (data, target) in enumerate(test_loader):
             batch_size = data.shape[0]
             data = data.view(batch_size, -1)
+            #print("In test looop!!!")
+            #print(data.shape)
+            #print(data[0][0])
+            #print(data[0][2000])
             target = target.unsqueeze(1)
+            #print(target.shape)
+            #print(target[10][0])
             data, target = data.to(device), target.to(device)
             #print("target:")
             #print(target)
@@ -205,7 +212,8 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
             #print("output")
             #print(output)
             loss_test += loss_fn(output, target)
-
+            #print("loss")
+            #print(loss_test)
             #loss_test += loss.item()
 
     loss_stats['test'].append(loss_test/len(test_loader)) #for each epoch
@@ -214,7 +222,7 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
         print('{} Epoch {}, Test loss {}'.format(
             datetime.datetime.now(), epoch,
             loss_test / len(test_loader)))
-        print("\n")
+        #print("\n")
 
     return loss_stats
 
@@ -237,12 +245,12 @@ def test(config, model, sets, n_epochs):
 
     #testset
     testset = Reanalysisdata(x_test, y_test, transform)
-    #print(x_test.shape, y_test.shape)
+    print(x_test.shape, y_test.shape)
 
     test_loader = torch.utils.data.DataLoader(
         testset,
         batch_size=config['val_batch_size'],
-        shuffle=False)
+        shuffle=True)
 
     loss_fn = nn.MSELoss() #MSE is the default loss function for most Pytorch regression problems.
 
