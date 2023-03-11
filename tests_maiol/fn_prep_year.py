@@ -52,7 +52,6 @@ def generate_plot(dir, filter_point):
     print('Highest prep '+str(max(time_target[filter_point]['2000']['prep'])))
 
     '''Count how many 0s'''
-    # check the count of 2
     count = time_target[filter_point]['2000']['prep'].count(0.0000000000)
     print('Days with 0 prep:', count)
 
