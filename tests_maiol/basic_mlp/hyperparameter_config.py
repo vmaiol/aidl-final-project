@@ -23,10 +23,9 @@ def load_hyper_conf(config_owner, config_type, config_search):
     ''' ----------- MAIOL ----------------------------------'''
     if config_owner == "maiol":
         if config_type == "mlp": #tipo de modelo
+            MAX_NUM_EPOCHS = conf_vars['MAX_NUM_EPOCHS'] #no la utilizo de momento
             #nos ayuda a configurar el tune.report. Cuando acabe de entrenar, le pediremos a rayTune con best_trial = results.get_best_trial("val_loss", "min", "last")
                 #cual ha sido la mejor config por esta metric y con que mode (en este caso min, la loss más baja)
-            MAX_NUM_EPOCHS = maiol_conf_vars['MAX_NUM_EPOCHS']
-            #para hacer el report cuando acabe de entrenar. Haremos algo parecido a esto en train o val. Segurament en val, ya que si queremos registrar la loss del val, tenemos que esperar a que termine el train_epoch, y val_epoch
             #tune.report(train_loss = loss_stats['train'][-1], val_loss=loss_stats['val'][-1])
             reporter = CLIReporter(
                 # parameter_columns=["l1", "l2", "lr", "batch_size"],
@@ -70,8 +69,26 @@ def load_hyper_conf(config_owner, config_type, config_search):
 
     elif config_owner == "victor":
         '''VICTOR CONFIG'''
+        MAX_NUM_EPOCHS = conf_vars['MAX_NUM_EPOCHS']
+        reporter = CLIReporter(metric_columns=["train_loss", "val_loss", "training_iteration"])
+        if config_search =='grid_search':
+            config = {}
+        elif config_search =='random_search':
+            config = {}
+        elif config_search == "other":
+            '''simple config para testear...'''
+            config = {}
 
     elif config_owner == "joan":
         '''JOAN CONFIG'''
+        MAX_NUM_EPOCHS = conf_vars['MAX_NUM_EPOCHS']
+        reporter = CLIReporter(metric_columns=["train_loss", "val_loss", "training_iteration"])
+        if config_search =='grid_search':
+            config = {}
+        elif config_search =='random_search':
+            config = {}
+        elif config_search == "other":
+            '''simple config para testear...'''
+            config = {}
 
     return MAX_NUM_EPOCHS, reporter, config

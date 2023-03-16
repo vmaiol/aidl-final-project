@@ -349,15 +349,13 @@ def main():
         shutil.rmtree('./outs_mlp_train/') #solo comentar si no queremos que borre...
 
     print("\nLoading the HYPERPARAMETER CONFIG...")
-    config_owner = "maiol"
-    config_type = "mlp"
-    config_search = "other" #grid_search, random_search, y other
-    max_n_epochs, reporter, config = load_hyper_conf(config_owner, config_type, config_search)
+    #config_owner = "maiol" config_type = "mlp" config_search = "other" #grid_search, random_search, y other
+    max_n_epochs, reporter, config = load_hyper_conf(conf_vars['config_owner'], conf_vars['config_type'], conf_vars['config_search'])
 
     '''LOADING THE DATA'''
     print("\nLoading the data...")
     #sets = load_data(maiol_conf_vars['DATA_DIR'])
-    data_dir = os.path.abspath(maiol_conf_vars['DATA_DIR'])
+    data_dir = os.path.abspath(conf_vars['DATA_DIR'])
     dataset = Downscaling_dataset(data_dir)
     print(len(dataset))
     train_set, test_set, val_set = torch.utils.data.random_split(dataset, [0.7,0.2,0.1])
@@ -371,12 +369,12 @@ def main():
     results = tune.run(
             partial(train, train_set=train_set, val_set=val_set),
             config=config, #definido en el conf del hyperparameter_config
-            num_samples=maiol_conf_vars['NUM_SAMPLES'], #importante este valor sobretodo si es random_search
+            num_samples=conf_vars['NUM_SAMPLES'], #importante este valor sobretodo si es random_search
             metric="val_loss", #metrica para obtener la mejor config, y el mode seguidamente
             mode="min",
             progress_reporter=reporter,  #definido en el conf del hyperparameter_config
             local_dir='./outs_mlp_train/', #donde se van a guardar los outputs etc
-            resources_per_trial={"cpu": maiol_conf_vars['cpu'], "gpu": maiol_conf_vars['gpu']} #por la GPU!!!
+            resources_per_trial={"cpu": conf_vars['cpu'], "gpu": conf_vars['gpu']} #por la GPU!!!
         )
 
     ''' ----------- TRAINING RESULTS!! ----------------'''
@@ -385,9 +383,8 @@ def main():
     print("Best config: {}".format(best_trial.config))
     best_config = best_trial.config
     f = open("./best_config.txt", "a")
-    f.write(str(results.best_logdir))
-    f.write(str(best_config))
-    f.write("\n")
+    f.write(str(results.best_logdir)+"\n")
+    f.write(str(best_config)+"\n\n")
     f.close()
     #print("Best validation loss: {}".format(best_trial.last_result["val_loss"]))
     dir_best_results = results.best_logdir #lo utilizaremos para cargar el modelo guardado
