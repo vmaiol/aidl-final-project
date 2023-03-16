@@ -15,19 +15,23 @@ from torch.utils.data import DataLoader
 import datetime
 import shutil
 
-from load_data import *
+#from load_data import * no se utiliza load_datapy
 from dataset import *
 from hyperparameter_config import *
 from model import *
 from collections import OrderedDict
+import matplotlib.pyplot as plt
 
 '''TRAINING ON THE GPU'''
 device = (torch.device('cuda') if torch.cuda.is_available()
           else torch.device('cpu'))
 print(f"Training on device {device}.")
-
+#print(torch.cuda.device_count())
+#print(torch.cuda.current_device())
+#print(torch.cuda.get_device_name(0))
 
 def create_dataloader(config, sets):
+    '''-----NO SE UTILIZAAA!!!!!!!!!----'''
     transform = transforms.Compose([
         # center-crop
         transforms.CenterCrop(config['img_size']),
@@ -54,12 +58,12 @@ def create_dataloader(config, sets):
     '''DATALOADERS'''
     train_loader = torch.utils.data.DataLoader(
         trainset,
-        batch_size=config['train_batch_size'],
+        batch_size=config['batch_size'],
         shuffle=True)
 
     val_loader = torch.utils.data.DataLoader(
         valset,
-        batch_size=config['val_batch_size'],
+        batch_size=config['batch_size'],
         shuffle=True)
 
     #NO HACE FALTA HACER EL DATALOADER DEL TEST, YA QUE CON LA MEJOR CONFIG ENTRENADA EN TRAIN Y VAL, DECIDIREMOS QUE BATCH utilizar
@@ -75,6 +79,28 @@ def check_loss_list(list, val):
         if val<x:
             return True
     return False
+
+def plots_learning_curves(plot_type, loss_stats, dir=None):
+    '''plots de las loss, accuracy...'''
+    #loss_stats contiene -> loss_stats ={'train':[], 'val':[], 'test':[]}
+    if plot_type == "train_val":
+        plot_name = "./plot_train_val.png"
+        plt.figure(figsize=(10, 8))
+        plt.subplot(2,1,1)
+        plt.xlabel('Epoch')
+        plt.ylabel('MSELoss')
+        plt.plot(loss_stats['train'], label='train')
+        plt.plot(loss_stats['val'], label='val')
+        plt.legend()
+    elif plot_type == "test":
+        plot_name = "./plot_test_best_config.png"
+        plt.figure(figsize=(10, 8))
+        plt.subplot(2,1,1)
+        plt.xlabel('Epoch')
+        plt.ylabel('MSELoss')
+        plt.plot(loss_stats['test'], label='test')
+
+    plt.savefig(plot_name, bbox_inches='tight')
 
 def save_model(model, path):
     torch.save(model.state_dict(), path)
@@ -93,6 +119,8 @@ def layers_config(img_size, img_vars):
             #print(img_size)
             img_size = int(img_size/2)
             next_size = int(img_size/2)
+            if next_size < 16:
+                next_size = 16
             if img_size >16: #16 como limite
                 layers.append([img_size, next_size, img_vars])
                 contador += 1
@@ -109,9 +137,16 @@ def layers_config(img_size, img_vars):
 
 def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader, loss_stats):
     print("Training epoch...")
+
+    device = "cpu"
+    if torch.cuda.is_available():
+        device = "cuda"
+    #print(f"Training on device {device}.")
+
     #for epoch in range(1, n_epochs + 1):
     '''TRAIN EPOCH SECTION!!!'''
     loss_train = 0.0
+    model.to(device)
     model.train()
 
     #for data, target in train_loader:
@@ -119,10 +154,12 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
         batch_size = data.shape[0]
         data = data.view(batch_size, -1)
 
-        data = data.to(device=device)
+        data = data.to(device)
+        #print("DATA SHAAAAPE")
         #print(data.shape)
+
         target = target.unsqueeze(1)
-        target = target.to(device=device)
+        target = target.to(device)
         optimizer.zero_grad()
         output = model(data)
 
@@ -154,9 +191,9 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
         for batch_idx, (data, target) in enumerate(val_loader):
             batch_size = data.shape[0]
             data = data.view(batch_size, -1)
-            data = data.to(device=device)
+            data = data.to(device)
             target = target.unsqueeze(1)
-            target = target.to(device=device)
+            target = target.to(device)
             output = model(data)
             loss = loss_fn(output, target)
 
@@ -188,6 +225,11 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
 
 def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
     '''Test/evaluation loop. Testing with data not seen'''
+    device = "cpu"
+    if torch.cuda.is_available():
+        device = "cuda"
+    #print(f"Training on device {device}.")
+    model.to(device)
     model.eval()
     loss_test = 0
     epoch_loss = 0
@@ -226,7 +268,7 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
 
     return loss_stats
 
-def test(config, model, sets, n_epochs):
+def test(config, model, test_set, n_epochs):
     print("Creating the dataloader...")
     loss_stats = {
         "train": [],
@@ -239,18 +281,16 @@ def test(config, model, sets, n_epochs):
         # center-crop
         transforms.CenterCrop(config['img_size']),
     ])
-
-    x_test = sets[2]
-    y_test = sets[5]
-
+    #x_test = sets[2]
+    #y_test = sets[5]
     #testset
-    testset = Reanalysisdata(x_test, y_test, transform)
-    print(x_test.shape, y_test.shape)
+    #testset = Reanalysisdata(x_test, y_test, transform)
+    #print(x_test.shape, y_test.shape)
 
-    test_loader = torch.utils.data.DataLoader(
-        testset,
-        batch_size=config['val_batch_size'],
-        shuffle=True)
+    test_set.dataset.transform = transform
+    test_loader = torch.utils.data.DataLoader(test_set,
+                                                batch_size=config['batch_size'],
+                                                shuffle=True)
 
     loss_fn = nn.MSELoss() #MSE is the default loss function for most Pytorch regression problems.
 
@@ -258,29 +298,49 @@ def test(config, model, sets, n_epochs):
     for epoch in range(1, n_epochs + 1):
         loss_stats = test_epoch(epoch, model, loss_fn, test_loader, loss_stats)
 
-def train(config, sets=None, n_epochs=None):
+    plots_learning_curves("test", loss_stats)
+
+def train(config, train_set=None, val_set=None):
     '''CREATING DATALOADER'''
     loss_stats = {
         "train": [],
         "val": [],
         "test":[]
     }
-    print("Creating the dataloader...")
 
+    print("Creating the dataloader...")
     #lo hago dentro del train con la config de Ray porque consideramos que el tamaño de la imagen es un hyperparametro. Asi puede ser variable
-    train_loader, val_loader = create_dataloader(config, sets) #solo creo train y val loader porque el test_loader lo creare a partir de resultados de la "mejor" config entrenada
+    transform = transforms.Compose([
+        # center-crop
+        transforms.CenterCrop(config['img_size']),
+    ])
+    train_set.dataset.transform = transform
+    val_set.dataset.transform = transform
+    train_loader = torch.utils.data.DataLoader(train_set,
+                                                batch_size=config['batch_size'],
+                                                shuffle=True)
+    val_loader = torch.utils.data.DataLoader(val_set,
+                                            batch_size=config['batch_size'],
+                                            shuffle=True)
+
+
+    #esta create_dataloader function ya no funciona
+    #train_loader, val_loader = create_dataloader(config, sets) #solo creo train y val loader porque el test_loader lo creare a partir de resultados de la "mejor" config entrenada
 
     layers = layers_config(config['img_size'], config['img_vars'])
     #model = Net(layers) -> no lo utilizaremos de momento
     model = BasicMlp(layers)
+    print(model)
 
     optimizer = optim.SGD(model.parameters(), config['lr'], weight_decay=config["l2"])
     loss_fn = nn.MSELoss() #MSE is the default loss function for most Pytorch regression problems.
 
     print("\nInitializing epochs loop...")
-    for epoch in range(1, n_epochs + 1):
+    for epoch in range(1, config['n_epochs'] + 1):
         loss_stats = train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader, loss_stats)
         #eval_epoch(epoch, model, optim, loss_fn, val_loader) - no era del todo practica separarlo en 2 funciones train y val
+
+    plots_learning_curves("train_val", loss_stats)
 
 def main():
     '''LOADING HYPERPARAMETER CONFIG'''
@@ -292,23 +352,31 @@ def main():
     config_owner = "maiol"
     config_type = "mlp"
     config_search = "other" #grid_search, random_search, y other
-    n_epochs, reporter, config = load_hyper_conf(config_owner, config_type, config_search)
+    max_n_epochs, reporter, config = load_hyper_conf(config_owner, config_type, config_search)
 
     '''LOADING THE DATA'''
     print("\nLoading the data...")
-    sets = load_data(maiol_conf_vars['DATA_DIR'])
+    #sets = load_data(maiol_conf_vars['DATA_DIR'])
+    data_dir = os.path.abspath(maiol_conf_vars['DATA_DIR'])
+    dataset = Downscaling_dataset(data_dir)
+    print(len(dataset))
+    train_set, test_set, val_set = torch.utils.data.random_split(dataset, [0.7,0.2,0.1])
+    print(len(train_set))
+    print(len(test_set))
+    print(len(val_set))
 
     '''INITIALIZING RAY TUNE ETC'''
     print("\nInitializing ray tune with config to train...")
-    ray.init(configure_logging=False, include_dashboard=False) #creo que no hace nada...
+    ray.init(configure_logging=False, include_dashboard=False, num_gpus=1) #creo que no hace nada...
     results = tune.run(
-            partial(train, sets = sets, n_epochs=n_epochs),
+            partial(train, train_set=train_set, val_set=val_set),
             config=config, #definido en el conf del hyperparameter_config
             num_samples=maiol_conf_vars['NUM_SAMPLES'], #importante este valor sobretodo si es random_search
             metric="val_loss", #metrica para obtener la mejor config, y el mode seguidamente
             mode="min",
             progress_reporter=reporter,  #definido en el conf del hyperparameter_config
             local_dir='./outs_mlp_train/', #donde se van a guardar los outputs etc
+            resources_per_trial={"cpu": maiol_conf_vars['cpu'], "gpu": maiol_conf_vars['gpu']} #por la GPU!!!
         )
 
     ''' ----------- TRAINING RESULTS!! ----------------'''
@@ -316,6 +384,11 @@ def main():
     #print(best_trial)
     print("Best config: {}".format(best_trial.config))
     best_config = best_trial.config
+    f = open("./best_config.txt", "a")
+    f.write(str(results.best_logdir))
+    f.write(str(best_config))
+    f.write("\n")
+    f.close()
     #print("Best validation loss: {}".format(best_trial.last_result["val_loss"]))
     dir_best_results = results.best_logdir #lo utilizaremos para cargar el modelo guardado
     dir_best_results_model = dir_best_results+"/mlp_model.pth"
@@ -340,7 +413,7 @@ def main():
     print(best_trained_model)
 
     '''lo testeamos'''
-    test(best_config, best_trained_model, sets, best_config['n_epochs'])
+    test(best_config, best_trained_model, test_set, best_config['n_epochs'])
     '''---------------------------------------------'''
 
 if __name__ == "__main__":

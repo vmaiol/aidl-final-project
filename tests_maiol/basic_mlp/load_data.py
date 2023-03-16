@@ -3,6 +3,7 @@ from torchmetrics.functional import r2_score
 import numpy as np
 import torch
 import torch.nn as nn
+import random
 
 #import matplotlib.pyplot as plt
 import netCDF4 as nc
@@ -18,10 +19,17 @@ def load_data(dir):
     '''GETTING FILES AND DATA'''
     #dir = "./data_sample_victor/"
     list_of_paths = sorted(filter(os.path.isfile, glob.glob(dir+'*.nc', recursive=True)))
+    #list_of_paths = glob.glob(dir+'*.nc', recursive=True)
+    random.shuffle(list_of_paths)
+    print(len(list_of_paths))
+    list_of_paths = list_of_paths[:len(list_of_paths)//2] #utilizo solo la mitad. //2 to make sure result of division is intege
+    print(len(list_of_paths))
 
     #print(list_of_paths)
     input_x = []
     input_y = []
+    no_run = True
+    if no_run==False:
     for point in list_of_paths:
         point_data = nc.Dataset(point)
         input=point_data['input'][0][:].data # 0 -> precipitation
@@ -39,12 +47,14 @@ def load_data(dir):
 
     '''LIST TO NUMPY ARRAY TYPE FLOAT32'''
     #en principio los valores creo que ya estan en float, just in case¿?
-    np_array_input_x = np.asarray(input_x).astype("float32")
-    np_array_input_y = np.asarray(input_y).astype("float32")
+    input_x = np.asarray(input_x).astype("float32")
+    input_y = np.asarray(input_y).astype("float32")
 
     '''INPUT ARRAY TO TENSOR FLOAT, TARGET AS TENSOR OF FLOATS'''
-    tensor_x = torch.tensor(np_array_input_x)
-    tensor_y = np_array_input_y
+    input_x = torch.tensor(input_x)
+    #tensor_y = input_y
+    #print(tensor_x)
+    #print(tensor_y)
 
     '''SPLITTING TRAIN AND TEST SETS'''
     #como estoy haciendo pruebas con 2 ficheros no me preocupo de dividir bien la data
@@ -54,7 +64,8 @@ def load_data(dir):
     #y_val = tensor_y[0:]
     #y_train = tensor_y[0:
 
-    (x_train_val, x_test, y_train_val, y_test) = train_test_split(tensor_x, tensor_y, test_size = .2)
+    (x_train_val, x_test, y_train_val, y_test) = train_test_split(input_x, input_y, test_size = .2)
+    del input_x, input_y #libero espacio
     # Split train into train and val
     (x_train, x_val, y_train, y_val) = train_test_split(x_train_val, y_train_val, test_size=0.1)
     #print(x_train.shape, x_val.shape, y_train.shape, y_val.shape)

@@ -12,3 +12,4 @@ opencv-python
 torchmetrics
 scikit-learn
 seaborn
+netCDF4

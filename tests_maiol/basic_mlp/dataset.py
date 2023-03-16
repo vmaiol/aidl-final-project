@@ -33,3 +33,26 @@ class Reanalysisdata(Dataset):
 
     def __len__(self):
         return self.length
+
+class Downscaling_dataset(Dataset):
+    def __init__(self, root_dir, transform=None):
+        self.files_path = [root_dir+"/"+file for file in os.listdir(root_dir)]
+        self.root_dir = root_dir
+        self.transform = transform
+
+    def __getitem__(self, index):
+        path_file= self.files_path[index]
+        point_data = nc.Dataset(path_file, mode="r")
+        #print("POINT DATAAAA!!")
+        #print(point_data)
+        #exit()
+        input, target = point_data['input'][0][:].data, point_data['target'][:].data
+        target = torch.tensor(target)
+        input = torch.tensor(input)
+        if self.transform:
+            input = self.transform(input)
+        point_data.close()
+        return input, target
+
+    def __len__(self):
+        return len(self.files_path)

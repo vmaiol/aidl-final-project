@@ -34,11 +34,10 @@ def load_hyper_conf(config_owner, config_type, config_search):
 
             if config_search =='grid_search': #yo lo he preparado para 2 tipos de de hyper tunn: grid search y random search
                 config = {
-                    "img_size": tune.grid_search([16, 32, 64, 128]),
+                    "img_size": tune.grid_search([28, 32, 64, 128]),
                     "img_vars" : tune.choice([1]),
-                    "train_batch_size": tune.grid_search([64, 128]),
-                    "val_batch_size": tune.choice([64, 128]),
-                    "n_epochs": tune.choice([50]),
+                    "batch_size": tune.grid_search([32, 64, 128]),
+                    "n_epochs": tune.choice([5]),
                     "l2": tune.loguniform(1e-5, 1e-1),
                     "lr": tune.loguniform(1e-4, 1e-1),
                 }
@@ -46,10 +45,9 @@ def load_hyper_conf(config_owner, config_type, config_search):
             elif config_search =='random_search':
                 #EN EL RANDOM SEARCH TIENE IMPORTANCIA EL NUM DE SAMPLES!!
                 config = {
-                    "img_size": tune.choice([16, 32, 64, 128]),
+                    "img_size": tune.choice([28, 32, 64, 128]),
                     "img_vars" : tune.choice([1]),
-                    "train_batch_size": tune.choice([64, 128]),
-                    "val_batch_size": tune.choice([64, 128]),
+                    "batch_size": tune.choice([32, 64, 128]),
                     "n_epochs": tune.choice([20, 50, 100]),
                     "l2": tune.loguniform(1e-5, 1e-1),
                     "lr": tune.loguniform(1e-4, 1e-1),
@@ -58,10 +56,9 @@ def load_hyper_conf(config_owner, config_type, config_search):
                 #algo simple para testear
                 '''simple config para testear...'''
                 config = {
-                    "img_size": tune.grid_search([64]),
+                    "img_size": tune.grid_search([28]),
                     "img_vars" : tune.choice([1]),
-                    "train_batch_size": tune.choice([64]),
-                    "val_batch_size": tune.choice([64]),
+                    "batch_size": tune.choice([16]),
                     "n_epochs": tune.choice([50]),
                     #"l1": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
                     #"l2": tune.loguniform(1e-5, 1),
