@@ -36,7 +36,7 @@ def load_hyper_conf(config_owner, config_type, config_search):
                     "img_size": tune.grid_search([28, 32, 64, 128]),
                     "img_vars" : tune.choice([1]),
                     "batch_size": tune.grid_search([32, 64, 128]),
-                    "n_epochs": tune.choice([5]),
+                    "n_epochs": tune.choice([20, 50, 100]),
                     "l2": tune.loguniform(1e-5, 1e-1),
                     "lr": tune.loguniform(1e-4, 1e-1),
                 }

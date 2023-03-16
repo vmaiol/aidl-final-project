@@ -9,5 +9,5 @@ conf_vars = {
     "gpu": 1,
     'config_owner':"maiol",
     'config_type':"mlp",
-    'config_search':"other" #grid_search, random_search, y other para tests simples
+    'config_search':"grid_search" #grid_search, random_search, y other para tests simples. Valores en hyperparameter_config.py
 }
