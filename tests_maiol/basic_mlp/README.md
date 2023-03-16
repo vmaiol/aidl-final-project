@@ -1,10 +1,10 @@
 ### To execute
 ```
-conda create --name aidl-final-project-maiol python=3.8
+conda create --name aidl-final-project-mlp python=3.8
 ```
 To activate the environment:
 ```
-conda activate aidl-final-project
+conda activate aidl-final-project-mlp
 ```
 and install the dependencies
 ```
