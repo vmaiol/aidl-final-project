@@ -39,13 +39,11 @@ def train_epoch(train_loader, network, optimizer, criterion, hparams, epoch):
   avg_loss = None
   avg_weight = 0.1
   for batch_idx, (data, target) in enumerate(train_loader):
-      #print(len(data[0][0].view(-1)))
       low_res = prec_lowres(data)
       data, target = data.to(device), target.unsqueeze(1).to(device)
       optimizer.zero_grad()
       output = network(data)
       loss_data = low_res - output
-      print(loss_data)
       loss = criterion(output, target)
       loss.backward()
       if avg_loss:
