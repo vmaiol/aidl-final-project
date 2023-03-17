@@ -37,10 +37,10 @@ dataset = Downscaling_dataset(path)
 
 train, test, val = torch.utils.data.random_split(dataset, [0.7,0.2,0.1])
 
-data_loader = test_loader = torch.utils.data.DataLoader(dataset, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
-train_loader = test_loader = torch.utils.data.DataLoader(train, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
-test_loader = test_loader = torch.utils.data.DataLoader(test, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
-val_loader = test_loader = torch.utils.data.DataLoader(val, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
+data_loader = torch.utils.data.DataLoader(dataset, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
+train_loader = torch.utils.data.DataLoader(train, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
+test_loader = torch.utils.data.DataLoader(test, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
+val_loader = torch.utils.data.DataLoader(val, batch_size=hparams['batch_size'], drop_last=True, shuffle=True)
 
 model = Downscaling_model1().to(hparams['device'])
 optimizer = torch.optim.Adam(model.parameters(), hparams['learning_rate'])
