@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 from collections import OrderedDict
 
-#models
+#models, so se utiliza
 class MlpNet(nn.Module):
     #no lo utilizo
     def __init__(self, layers):
@@ -32,13 +32,14 @@ class MlpNet(nn.Module):
         z = self.out(z)  # no activation
         return z
 
+#este es el BUENO
 class BasicMlp(nn.Module):
     def __init__(self, layers):
         super().__init__()
         layers_dict = OrderedDict()
         idx=0
         idx_aux=1
-        #relleno el dict con la estructura que tendra en Sequential
+        #dict con la estructura que tendra en Sequential
         for layer in layers:
             if idx_aux < len(layers):
                 layers_dict[str(idx)] = nn.Linear(layer[0],layer[1])

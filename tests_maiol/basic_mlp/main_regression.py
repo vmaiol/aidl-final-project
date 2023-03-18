@@ -89,6 +89,7 @@ def plots_learning_curves(plot_type, loss_stats, dir=None):
         plt.subplot(2,1,1)
         plt.xlabel('Epoch')
         plt.ylabel('MSELoss')
+        plt.title('Train and val')
         plt.plot(loss_stats['train'], label='train')
         plt.plot(loss_stats['val'], label='val')
         plt.legend()
@@ -96,9 +97,11 @@ def plots_learning_curves(plot_type, loss_stats, dir=None):
         plot_name = "./plot_test_best_config.png"
         plt.figure(figsize=(10, 8))
         plt.subplot(2,1,1)
+        plt.title('Test with the best config trained')
         plt.xlabel('Epoch')
         plt.ylabel('MSELoss')
         plt.plot(loss_stats['test'], label='test')
+        plt.legend()
 
     plt.savefig(plot_name, bbox_inches='tight')
 
@@ -141,7 +144,7 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
     device = "cpu"
     if torch.cuda.is_available():
         device = "cuda"
-    #print(f"Training on device {device}.")
+    print(f"Training on device {device}.")
 
     #for epoch in range(1, n_epochs + 1):
     '''TRAIN EPOCH SECTION!!!'''
@@ -228,7 +231,7 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
     device = "cpu"
     if torch.cuda.is_available():
         device = "cuda"
-    #print(f"Training on device {device}.")
+    print(f"Testing on device {device}.")
     model.to(device)
     model.eval()
     loss_test = 0
@@ -253,7 +256,8 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
             output = model(data)
             #print("output")
             #print(output)
-            loss_test += loss_fn(output, target)
+            loss = loss_fn(output, target)
+            loss_test += loss.item()
             #print("loss")
             #print(loss_test)
             #loss_test += loss.item()
@@ -393,7 +397,6 @@ def main():
     #Best trial config: {'img_size': 64, 'img_vars': 1, 'train_batch_size': 64, 'val_batch_size': 64, 'n_epochs': 10, 'lr': 0.011850997181721131}
     #Best trial final validation loss: 13.202382882436117
 
-
     '''-------------- TESTING BEST RESUUUUUULTS------------'''
     '''we select the best model with an optimal combination of hyperparameters'''
     '''creamos el modelo con los mejores hyperparameters'''
@@ -412,6 +415,6 @@ def main():
     '''lo testeamos'''
     test(best_config, best_trained_model, test_set, best_config['n_epochs'])
     '''---------------------------------------------'''
-
+    
 if __name__ == "__main__":
     main()

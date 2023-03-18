@@ -33,10 +33,10 @@ def load_hyper_conf(config_owner, config_type, config_search):
 
             if config_search =='grid_search': #yo lo he preparado para 2 tipos de de hyper tunn: grid search y random search
                 config = {
-                    "img_size": tune.grid_search([28, 32, 64, 128]),
+                    "img_size": tune.grid_search([32, 64, 128]),
                     "img_vars" : tune.choice([1]),
                     "batch_size": tune.grid_search([32, 64, 128]),
-                    "n_epochs": tune.choice([20, 50, 100]),
+                    "n_epochs": tune.choice([10]),
                     "l2": tune.loguniform(1e-5, 1e-1),
                     "lr": tune.loguniform(1e-4, 1e-1),
                 }
@@ -47,22 +47,22 @@ def load_hyper_conf(config_owner, config_type, config_search):
                     "img_size": tune.choice([28, 32, 64, 128]),
                     "img_vars" : tune.choice([1]),
                     "batch_size": tune.choice([32, 64, 128]),
-                    "n_epochs": tune.choice([20, 50, 100]),
+                    "n_epochs": tune.choice([10]),
                     "l2": tune.loguniform(1e-5, 1e-1),
                     "lr": tune.loguniform(1e-4, 1e-1),
                 }
             elif config_search == "other":
-                #algo simple para testear
+                #algo simple para testear o para utilizarlo con la mejor combinacion obtenida en random searc o grid search
                 '''simple config para testear...'''
                 config = {
-                    "img_size": tune.grid_search([28]),
-                    "img_vars" : tune.choice([1]),
-                    "batch_size": tune.choice([16]),
-                    "n_epochs": tune.choice([50]),
+                    "img_size": 64,
+                    "img_vars" : 1,
+                    "batch_size": 32,
+                    "n_epochs": 10,
                     #"l1": tune.sample_from(lambda _: 2**np.random.randint(2, 9)),
                     #"l2": tune.loguniform(1e-5, 1),
-                    "l2": tune.loguniform(1e-5, 1e-1),
-                    "lr": tune.loguniform(1e-4, 1e-1),
+                    "l2": 0.0015437599875849839,
+                    "lr": 0.01898635166558231,
                 }
 
         ''' ----------- FIN CONFIG MAIOL ----------------------------------'''
