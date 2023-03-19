@@ -28,7 +28,8 @@ python3 main.py
 ```
 To execute the CNN model with only precipitation variable:
 ```
-python3 CNN/main.py
+cd CNN
+python3 main.py
 ```
 
 
