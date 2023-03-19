@@ -3,7 +3,7 @@ conf_vars = {
     "MAX_NUM_EPOCHS" : 10, #de mom no la utilizo
     "NUM_SAMPLES" : 1, #numero de veces a ejecutar la config/search, especialmente random_search
     "DATA_DIR" : "./../data_sample_victor",
-    #"DATA_DIR" : "/Volumes/muntanya/02_data_reduced/",
+    #"DATA_DIR" : "./data_reduced/",
     "cpu": 2,
     "gpu": 1,
     'config_owner':"maiol",
