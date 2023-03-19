@@ -16,8 +16,11 @@ and install the dependencies
 ```
 pip install -r requirements.txt
 ```
-To execute the CNN model with only precipitation variable:
+To execute the CNN model with only precipitation variable go to the CNN directory
 ```
 cd CNN
+```
+And then execute the main.py:
+```
 python3 main.py
 ```
