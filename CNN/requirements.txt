@@ -1,8 +1,0 @@
-matplotlib
-numpy
-Pillow
-torch
-pandas
-torchvision
-netCDF4
-pytorch-lightning
