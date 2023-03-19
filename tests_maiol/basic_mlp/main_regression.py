@@ -80,7 +80,27 @@ def check_loss_list(list, val):
             return True
     return False
 
-def plots_learning_curves(plot_type, loss_stats, dir=None):
+def prec_lowres(input):
+    """
+    Function to extract the low resolution precipitation of the input data.
+    """
+    #print("In prec low res!!!")
+    mid_values = []
+    for data in input:
+        mid = data.view(-1)
+        mid = mid.tolist()
+        #print(type(mid))
+        len_vector = int(len(mid))
+        mid_index = int((len_vector/2) -1) #index empieza a 0. Y siempre tratamos shapes pares
+        #print("len vector", len_vector)
+        #print("mid index", mid_index)
+        mid_values.append(mid[mid_index])
+        #print("LOW RES PRECIPITATIOOOON", mid[mid_index])
+    #print("len mid value", str(len(mid_values)))
+    #exit()
+    return torch.tensor(mid_values)
+
+def plots_learning_curves(plot_type, loss_stats, error_stats, dir=None):
     '''plots de las loss, accuracy...'''
     #loss_stats contiene -> loss_stats ={'train':[], 'val':[], 'test':[]}
     if plot_type == "train_val":
@@ -88,19 +108,22 @@ def plots_learning_curves(plot_type, loss_stats, dir=None):
         plt.figure(figsize=(10, 8))
         plt.subplot(2,1,1)
         plt.xlabel('Epoch')
-        plt.ylabel('MSELoss')
+        #plt.ylabel('MSELoss')
         plt.title('Train and val')
-        plt.plot(loss_stats['train'], label='train')
-        plt.plot(loss_stats['val'], label='val')
+        plt.plot(loss_stats['train'], label='train loss')
+        #plt.plot(error_stats['train'], label='train error')
+        plt.plot(loss_stats['val'], label='val loss')
+        plt.plot(error_stats['val'], label='val error')
         plt.legend()
     elif plot_type == "test":
         plot_name = "./plot_test_best_config.png"
         plt.figure(figsize=(10, 8))
         plt.subplot(2,1,1)
-        plt.title('Test with the best config trained')
+        plt.title('Test')
         plt.xlabel('Epoch')
-        plt.ylabel('MSELoss')
-        plt.plot(loss_stats['test'], label='test')
+        #plt.ylabel('MSELoss')
+        plt.plot(loss_stats['test'], label='test loss')
+        plt.plot(error_stats['test'], label='test error')
         plt.legend()
 
     plt.savefig(plot_name, bbox_inches='tight')
@@ -138,7 +161,7 @@ def layers_config(img_size, img_vars):
     #print(len(layers))
     return layers
 
-def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader, loss_stats):
+def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader, loss_stats, error_stats):
     print("Training epoch...")
 
     device = "cpu"
@@ -149,11 +172,15 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
     #for epoch in range(1, n_epochs + 1):
     '''TRAIN EPOCH SECTION!!!'''
     loss_train = 0.0
+    error_train = 0.0
     model.to(device)
     model.train()
 
     #for data, target in train_loader:
     for batch_idx, (data, target) in enumerate(train_loader):
+        low_res_values = prec_lowres(data)
+        low_res_values = low_res_values.unsqueeze(1).to(device)
+
         batch_size = data.shape[0]
         data = data.view(batch_size, -1)
 
@@ -167,6 +194,7 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
         output = model(data)
 
         loss = loss_fn(output, target)
+        low_res_error = loss_fn(low_res_values, target)
 
         loss.backward()
         optimizer.step()
@@ -174,9 +202,13 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
         #Computing accuracy
         #acc += accuracy(output, target, 0.10)
         loss_train += loss.item()
+        error_train += low_res_error.item()
+        #print(error_train)
 
     #guardando las losses de train
     loss_stats['train'].append(loss_train/len(train_loader)) #for each epoch
+    #errors
+    error_stats['train'].append(error_train/len(train_loader)) #for each epoch
 
     if epoch == 1 or epoch % 10 == 0:
         print('{} Epoch {}, Training loss {}'.format(
@@ -189,23 +221,31 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
     '''EVAL EPOCH SECTION!!!'''
     print("Validating epoch...")
     loss_val = 0.0
+    error_val = 0.0
     with torch.no_grad(): #no backprop en validation, ergo, no hay optimizador
         model.eval()  # Optional creo
         for batch_idx, (data, target) in enumerate(val_loader):
+            low_res_values = prec_lowres(data)
+            low_res_values = low_res_values.unsqueeze(1).to(device)
+
             batch_size = data.shape[0]
             data = data.view(batch_size, -1)
             data = data.to(device)
             target = target.unsqueeze(1)
             target = target.to(device)
             output = model(data)
+
             loss = loss_fn(output, target)
+            low_res_error = loss_fn(low_res_values, target)
 
             loss_val += loss.item()
+            error_val += low_res_error.item()
 
     #guardando las losses de val
     #print("loss_stats")
     #print(loss_stats)
     loss_stats['val'].append(loss_val/len(val_loader)) #for each epoch
+    error_stats['val'].append(error_val/len(val_loader)) #for each epoch
 
     if epoch == 1 or epoch % 10 == 0:
         print('{} Epoch {}, Validation loss {}'.format(
@@ -224,9 +264,9 @@ def train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader,
     #viene a ser un append a tune de la loss que hemos obtenido para que despues analizamos los resultados
     #importante hacerlo lo ultimo del loop, porque sino en la ultima iteracion de todas, raytune termina donde hace el report
     tune.report(val_loss=loss_stats['val'][-1])
-    return loss_stats
+    return loss_stats, error_stats
 
-def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
+def test_epoch(epoch, model, loss_fn, test_loader, loss_stats, error_stats):
     '''Test/evaluation loop. Testing with data not seen'''
     device = "cpu"
     if torch.cuda.is_available():
@@ -236,33 +276,30 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
     model.eval()
     loss_test = 0
     epoch_loss = 0
+    error_test = 0.0
     #print("----------------------------------")
     #print(len(test_loader))
     with torch.no_grad():
         loss_train = 0.0
         for batch_idx, (data, target) in enumerate(test_loader):
+            low_res_values = prec_lowres(data)
+            low_res_values = low_res_values.unsqueeze(1).to(device)
+
             batch_size = data.shape[0]
             data = data.view(batch_size, -1)
-            #print("In test looop!!!")
-            #print(data.shape)
-            #print(data[0][0])
-            #print(data[0][2000])
             target = target.unsqueeze(1)
-            #print(target.shape)
-            #print(target[10][0])
+
             data, target = data.to(device), target.to(device)
-            #print("target:")
-            #print(target)
             output = model(data)
-            #print("output")
-            #print(output)
+
             loss = loss_fn(output, target)
+            low_res_error = loss_fn(low_res_values, target)
+
             loss_test += loss.item()
-            #print("loss")
-            #print(loss_test)
-            #loss_test += loss.item()
+            error_test += low_res_error.item()
 
     loss_stats['test'].append(loss_test/len(test_loader)) #for each epoch
+    error_stats['test'].append(error_test/len(test_loader)) #for each epoch
 
     if epoch == 1 or epoch % 10 == 0:
         print('{} Epoch {}, Test loss {}'.format(
@@ -270,11 +307,17 @@ def test_epoch(epoch, model, loss_fn, test_loader, loss_stats):
             loss_test / len(test_loader)))
         #print("\n")
 
-    return loss_stats
+    return loss_stats, error_stats
 
 def test(config, model, test_set, n_epochs):
     print("Creating the dataloader...")
     loss_stats = {
+        "train": [],
+        "val": [],
+        "test":[]
+    }
+
+    error_stats = {
         "train": [],
         "val": [],
         "test":[]
@@ -300,13 +343,19 @@ def test(config, model, test_set, n_epochs):
 
     print("Test epochs loop...")
     for epoch in range(1, n_epochs + 1):
-        loss_stats = test_epoch(epoch, model, loss_fn, test_loader, loss_stats)
+        loss_stats, error_stats = test_epoch(epoch, model, loss_fn, test_loader, loss_stats, error_stats)
 
-    plots_learning_curves("test", loss_stats)
+    plots_learning_curves("test", loss_stats, error_stats)
 
 def train(config, train_set=None, val_set=None):
     '''CREATING DATALOADER'''
     loss_stats = {
+        "train": [],
+        "val": [],
+        "test":[]
+    }
+
+    error_stats = {
         "train": [],
         "val": [],
         "test":[]
@@ -341,10 +390,10 @@ def train(config, train_set=None, val_set=None):
 
     print("\nInitializing epochs loop...")
     for epoch in range(1, config['n_epochs'] + 1):
-        loss_stats = train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader, loss_stats)
+        loss_stats, error_stats = train_eval_epoch(epoch, model, optimizer, loss_fn, train_loader, val_loader, loss_stats, error_stats)
         #eval_epoch(epoch, model, optim, loss_fn, val_loader) - no era del todo practica separarlo en 2 funciones train y val
 
-    plots_learning_curves("train_val", loss_stats)
+    plots_learning_curves("train_val", loss_stats, error_stats)
 
 def main():
     '''LOADING HYPERPARAMETER CONFIG'''
@@ -415,6 +464,6 @@ def main():
     '''lo testeamos'''
     test(best_config, best_trained_model, test_set, best_config['n_epochs'])
     '''---------------------------------------------'''
-    
+
 if __name__ == "__main__":
     main()
