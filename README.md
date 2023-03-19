@@ -24,7 +24,11 @@ conda deactivate
 
 Execute basic structure to check that minimums have been installed. In the project folder:
 ```
-python main.py
+python3 main.py
+```
+To execute the CNN model with only precipitation variable:
+```
+python3 CNN/main.py
 ```
 
 
