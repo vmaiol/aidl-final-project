@@ -116,7 +116,7 @@ def plots_learning_curves(plot_type, loss_stats, error_stats, dir=None):
         plt.plot(error_stats['val'], label='val error')
         plt.legend()
     elif plot_type == "test":
-        plot_name = "./plot_test_best_config.png"
+        plot_name = "./plot_test.png"
         plt.figure(figsize=(10, 8))
         plt.subplot(2,1,1)
         plt.title('Test')
