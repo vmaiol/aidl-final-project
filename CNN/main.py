@@ -15,7 +15,7 @@ from model import *
 from dataset import *
 from resources import *
 
-path = "data_sample"
+path = "../mini_dataset"
 
 torch.manual_seed(0)
 
