@@ -41,24 +41,25 @@ Advised by Amanda Duarte.
 
 A more detailed introduction to the project, including its purpose and goals.
 
+
 ## Introduction and motivation
 
 A list of the technologies used in the project, including programming languages, frameworks, libraries, and tools.
+
 
 ## Proposal
 
 A list of the key features of the project, along with any relevant screenshots or examples.
 
+
 ## Hypothesis
-
-Step-by-step instructions for installing the project, including any necessary dependencies.
-
 ## Dataset
 ### Datasets used
 ### Data preprocessing
 ### Later transformations and updates
 
 Instructions for how to use the project, including any command-line options or other configuration settings.
+
 
 ## Working environment
 ### Github
@@ -76,32 +77,42 @@ Instructions for how to use the project, including any command-line options or o
 ### Google colab
 Instructions for how to use the project, including any command-line options or other configuration settings.
 
+
 ## Computational resources
 Instructions for how to use the project, including any command-line options or other configuration settings.
+
 
 ## Experiments
 Instructions for how to use the project, including any command-line options or other configuration settings.
 
+
 ## Architecture
 Instructions for how to use the project, including any command-line options or other configuration settings.
+
 
 ## Loss functions
 Instructions for how to use the project, including any command-line options or other configuration settings.
 
+
 ## Metrics
 Instructions for how to use the project, including any command-line options or other configuration settings.
+
 
 ## Setbacks
 Instructions for how to use the project, including any command-line options or other configuration settings.
 
+
 ## Results
 Instructions for how to use the project, including any command-line options or other configuration settings.
+
 
 ## Conclusions
 Instructions for how to use the project, including any command-line options or other configuration settings.
 
+
 ## Additional experiments and developments
 Instructions for how to use the project, including any command-line options or other configuration settings.
+
 
 ## How to to run the code
 ### Data preprocessing
