@@ -1,4 +1,6 @@
-### Instructions to run the code
+## Instructions to run the code
+
+Create the environment:
 ```
 conda create --name aidl-final-project-mlp python=3.8
 ```
