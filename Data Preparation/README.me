@@ -1,0 +1,9 @@
+The following lines describe the data preprocessing that has been done in a private server of the company of one of the team’s components. The original data from which the data is obtained is very large to have samples of it to be tested. 
+
+The files considered in the preprocessing are described next:
+00_Data_Preparation_00_Download_Precip_HighRes.ipyn -> Code to download the daymet dataset.  
+00_Data_Preparation_01_Selection_points.ipynb -> Code to select initially 4000 points from the available grid of the daymet dataset and later reduce to only 50 in the Nevada-Utah region. 
+00_Data_Preparation_02_Compute_Mean_Std.ipynb -> Script to normalize and remove the seasonal cycle to all the data required for the input. 
+00_Data_Preparation_03_Compute_model_input_data.ipynb -> Computation of the individual input files for the CNN. 
+00_Data_Preparation_04_Distribution_Precip_of_Points.ipynb -> Additional analysis of the distribution of the 50 points chosen and further reduction removing points closer than 100 km to reduce the size of the final dataset. 
+
