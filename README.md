@@ -39,12 +39,17 @@ Advised by Amanda Duarte.
 
 ## Repository structure
 
-A more detailed introduction to the project, including its purpose and goals.
+The repository has three branches and the following structure:
+  - Main: Data preparation, the CNN and MLP algorithms organized in folders. Plus a small dataset to basically run the code, and a folder with images used for this report.
+  - Master: The initial “main” branch to upload our progress. Not used much despite a proposed initial files structure for the project.
+  - Tests: Tests done during the development.
 
 
 ## Introduction and motivation
 
-A list of the technologies used in the project, including programming languages, frameworks, libraries, and tools.
+Como poner imgs, ejemplo:
+![alt text](image.jpg)
+*Caption goes here*
 
 
 ## Proposal
