@@ -58,7 +58,7 @@ Addressing these challenges requires ongoing research and development of climate
 
 ## Proposal
 
-The main goal and the proposal of this project is to introduce deep learning techniques so we can improve the climate models' accuracy and predictive power. Climate models are complex, nonlinear systems with many variables, and deep learning models are particularly suited to analyzing such complex data sets. Here are a few reasons why deep learning is important in climate modelling:
+The main goal and the proposal of this project is to introduce deep learning techniques so we can improve the climate models' accuracy and predictive power. Climate models are complex, nonlinear systems with many variables, and deep learning models are particularly suited to analyzing such complex datasets. Here are a few reasons why deep learning is important in climate modelling:
 
   **- Improved accuracy:**
   Deep learning models can learn complex relationships between input variables and output variables in a way that traditional statistical models cannot. This can lead to more accurate predictions of future climate patterns and more precise estimates of the impacts of climate change.
@@ -251,7 +251,7 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
   With this solution we were able to obtain a variable model architecture depending on the size of the image. Since it is a simple MLP, it has been relatively easy to implement such a solution.
 
   **- Results with the best combination:**
-  
+
   **Reduced dataset:**
   ![MSE results for various models](./imgs/final_report/plot_train_val_six_k_files.png)
   *Train and validation in the reduced dataset*
@@ -268,9 +268,9 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
 
   The values of the val and test error are the results of the low resolution values minus the target (high resolution values). If the model predicts worse than this it means that we are predicting worse than the input values (low resolution). Therefore, the model would not be performing well at all.
 
-  The conclusion we get from the comparison is that the MLP predicts better on the reduced data set than on the large data set, although there is some underfitting in the training of the reduced dataset.
+  The conclusion we get from the comparison is that the MLP predicts better on the reduced dataset than on the large dataset, although there is some underfitting in the training of the reduced dataset.
 
-  Not only does it predict better with less data, but in the large data set the estimation of the low resolution value is closer to the target (high resolution values), which are the val and test error.  Hence, the model predicts worse.
+  Not only does it predict better with less data, but in the large dataset the estimation of the low resolution value is closer to the target (high resolution values), which are the val and test error.  Hence, the model predicts worse.
 
   One hypothesis of why it seems to perform better with less data and the same combination of hyperparameters, could be because there is a big difference between the two datasets: 7 GB versus 100 GB. Also, probably, there is too much information and data for an MLP, since it is fully connected.
 
