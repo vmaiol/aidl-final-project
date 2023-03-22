@@ -179,8 +179,11 @@ Very briefly: when we thought we had the VM ready in a google cloud account shar
 ## Results
 An analysis has been performed with a fixed network parameter of learning rate to be fixed at 10-4 and the full dataset with 25 locations. We tested both predicting only with the low-resolution precipitation and the multi-variable low-resolution (8 variables used as predictors). The figure below shows the evolution of the loss through the 10 epochs of the training for both CNN models. Both show a reduction as the epochs evolve together with the test loss, indicating good progress in the training.
 
-![Precipitation and multivariable results](./imgs/final_report/precipitation_and_multi-variable_plots.png)
-*Precipitation and multivariable results*
+![Results with just precipitation variable](./imgs/final_report/plot_results_precipitation.png)
+*Results with just precipitation variable*
+
+![Multi-variable results](./imgs/final_report/plot_results_multi.png)
+*Multi-variable results*
 
 The two stars on the right of each figure indicate the values of the loss in the validation test (grey) and the loss computed with the low-resolution estimate, our benchmark (red). The comparison of these quantities is shown more illustratively in the next figure. It shows the values of the loss (Mean Squared Error) in the validation set, for the two experiments: using only the precipitation (in blue) as the predictor and the full input (8 variables, multi-variable in red). The prediction delivered by the low-resolution precipitation estimate is shown in yellow, and it is defined as our benchmark.
 
@@ -207,6 +210,9 @@ Since we were dealing with a regression problem, we had to avoid using a non-lin
 Ray Tune is a Python library to implement hyperparameter tuning, which helps to obtain the best possible combination of hyperparameters for our AI algorithm.
 
 Using hyperparameter tuning is very useful when we have many possibilities of hyperparameter combinations and even a wide range of values between some of them. Automating this process helps a lot in terms of results and time, and this is achieved by defining a configuration search space of hyperparameters to be tested. For example:
+
+![Combinations of hyperparameters tested](./imgs/final_report/grid_search_cloud_init.png)
+*Combinations of hyperparameters tested*
 
 During the training and validation, we’ll send to Ray Tune the results we are obtaining for each combination. Then, we will “ask” Ray Tune which combination should be the best related to the value of the metric. For example, the best combination of hyperparameters for the lowest validation loss. After this, when we have the best combination, we’ll just have to test it as usual, with unseen data.
 
@@ -244,8 +250,19 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
 
   **- Results with the best combination:**
   **Reduced dataset:**
+  ![MSE results for various models](./imgs/final_report/plot_train_val_six_k_files.png)
+  *Train and validation in the reduced dataset*
+
+  ![MSE results for various models](./imgs/final_report/plot_test_six_k_files.png)
+  *Test results for the reduced dataset*
 
   **Large dataset (the one used in the CNN)**
+  ![MSE results for various models](./imgs/final_report/big_dataset_train_and_val.png)
+  *Train and validation in the large dataset*
+
+  ![MSE results for various models](./imgs/final_report/big_dataset_test.png)
+  *Test results for the large dataset*
+
   The values of the val and test error are the results of the low resolution values minus the target (high resolution values). If the model predicts worse than this it means that we are predicting worse than the input values (low resolution). Therefore, the model would not be performing well at all.
 
   The conclusion we get from the comparison is that the MLP predicts better on the reduced data set than on the large data set, although there is some underfitting in the training of the reduced dataset.
@@ -255,7 +272,6 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
   One hypothesis of why it seems to perform better with less data and the same combination of hyperparameters, could be because there is a big difference between the two datasets: 7 GB versus 100 GB. Also, probably, there is too much information and data for an MLP, since it is fully connected.
 
   It could be that with a little more data in the reduced dataset, the MLP could predict good values for this problem without the need of a very large dataset.
-
 
 
 ## How to to run the code
