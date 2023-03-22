@@ -60,13 +60,13 @@ Addressing these challenges requires ongoing research and development of climate
 
 The main goal and the proposal of this project is to introduce deep learning techniques so we can improve the climate models' accuracy and predictive power. Climate models are complex, nonlinear systems with many variables, and deep learning models are particularly suited to analyzing such complex data sets. Here are a few reasons why deep learning is important in climate modelling:
 
-  ** - Improved accuracy: **
+  **- Improved accuracy:**
   Deep learning models can learn complex relationships between input variables and output variables in a way that traditional statistical models cannot. This can lead to more accurate predictions of future climate patterns and more precise estimates of the impacts of climate change.
-  ** - Large-scale data analysis: **
+  **- Large-scale data analysis:**
   Climate models rely on large amounts of data, and deep learning models can process vast amounts of data much faster than traditional statistical models. This can lead to a more efficient analysis of data and faster model development.
-  ** - Nonlinear relationships: **
+  **- Nonlinear relationships:**
   Climate models are highly nonlinear, which means that small changes in one variable can have large effects on other variables. Deep learning models can handle these nonlinear relationships better than traditional models, which assume linear relationships between variables.
-  ** - Improved representation of processes: **
+  **- Improved representation of processes:**
   Deep learning models can be used to represent complex physical processes in climate models, such as cloud formation and ocean circulation. This can improve the accuracy of the model by incorporating more detailed information about the processes that drive climate patterns.
 
 Overall, deep learning has the potential to significantly improve the accuracy and predictive power of climate models, which is critical for understanding the impacts of climate change and developing effective strategies for mitigating its effects.
@@ -154,9 +154,11 @@ Overall, this model can be used to downscale an image while preserving important
 The following images represent both architectures, almost the same.
 
 ![Single variable (precipitation) CNN architecture](./imgs/final_report/CNN_archi_one_variable.png)
+
 *Single variable (precipitation) CNN architecture*
 
 ![Multi-variable CNN architecture](./imgs/final_report/CNN_archi_multivariable.png)
+
 *Multi-variable CNN architecture*
 
 ## Loss functions
@@ -177,7 +179,7 @@ Very briefly: when we thought we had the VM ready in a google cloud account shar
 ## Results
 An analysis has been performed with a fixed network parameter of learning rate to be fixed at 10-4 and the full dataset with 25 locations. We tested both predicting only with the low-resolution precipitation and the multi-variable low-resolution (8 variables used as predictors). The figure below shows the evolution of the loss through the 10 epochs of the training for both CNN models. Both show a reduction as the epochs evolve together with the test loss, indicating good progress in the training.
 
-![Precipitation and multivariable results](./imgs/final_report/precipitation_and_multi-variable_plots)
+![Precipitation and multivariable results](./imgs/final_report/precipitation_and_multi-variable_plots.png)
 *Precipitation and multivariable results*
 
 The two stars on the right of each figure indicate the values of the loss in the validation test (grey) and the loss computed with the low-resolution estimate, our benchmark (red). The comparison of these quantities is shown more illustratively in the next figure. It shows the values of the loss (Mean Squared Error) in the validation set, for the two experiments: using only the precipitation (in blue) as the predictor and the full input (8 variables, multi-variable in red). The prediction delivered by the low-resolution precipitation estimate is shown in yellow, and it is defined as our benchmark.
@@ -201,13 +203,71 @@ An extra MLP has been developed to see its performance with the same problem. In
 
 Since we were dealing with a regression problem, we had to avoid using a non-linear activation function in the output of the last layer in order to obtain the "real" value of the prediction. In the hidden layers a ReLU has been used since it does not affect the positive values but for the negative ones by changing them to 0. Probably we could have also used it in the last layer (output), but we think that it would not have made a difference.
 
+ - Hyperparameter tuning with Ray Tune.
+Ray Tune is a Python library to implement hyperparameter tuning, which helps to obtain the best possible combination of hyperparameters for our AI algorithm.
+
+Using hyperparameter tuning is very useful when we have many possibilities of hyperparameter combinations and even a wide range of values between some of them. Automating this process helps a lot in terms of results and time, and this is achieved by defining a configuration search space of hyperparameters to be tested. For example:
+
+During the training and validation, we’ll send to Ray Tune the results we are obtaining for each combination. Then, we will “ask” Ray Tune which combination should be the best related to the value of the metric. For example, the best combination of hyperparameters for the lowest validation loss. After this, when we have the best combination, we’ll just have to test it as usual, with unseen data.
+
+We applied a grid search and a random search to obtain the best combination of hyperparameters. We have done these experiments in a reduced dataset: 6000 files and 7GB approx. Some good results were obtained:
+
+Seems that is underfitting a bit, but good enough to have an intuition of the best combination among the others.
+
+The combination was:
+  - batch_size=32,
+  - img_size=64,
+  - l2=0.0015437599875849839,
+  - lr=0.01898635166558231,
+  - n_epochs=10
+
+Some other results in this link:
+https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNING_RAY_TUNE.pdf
+
+  **- MLP architecture:**
+  The architecture of the MLP model has some aspects to take into account.
+  First, as we have already commented, we were dealing with a regression problem, so we had to avoid using a non-linear activation function in the output of the last layer. For the hidden layers a ReLUs has been used since it does not affect the positive values but for the negative ones by changing them to 0. Probably we could have also used it in the last layer (output), but we think that it would not have made any important effect.
+
+  An MSELoss has also been used.
+
+  Then, when we wanted to apply the hyperparameter tuning, one of these parameters was the size of the "image" (matrix). As a consequence, the inputs and outputs of the hidden layers are affected because they should be variable to this size. At least for the first layer.
+
+  To solve this and to be able to have a "quite" variable architecture depending on the size of the tensor that was going to receive the model, we created a function to define the inputs and outputs of each layer, as well as the number of layers that the model was going to have. Briefly, it has been developed as follows:
+  - The function receives the tensor (image) and multiplies width x height x dimensions (it was always 1 dimension, precipitation).
+  - In a loop, the resultant value of width x height x dimensions was divided by 2 to obtain the input size of the next layer.
+  - Each iteration was one layer more.
+  - If the value divided by 2 was less than 16, it was not done and was assigned a size of 16. Mainly because the last layer received 16 as input size and as output 1. 1 because we want to get the "real" value predicted and without modification of any activation function.
+  - All this was saved in a dict that was used in the init of the model to create a MLP Sequential.
+  - The size of the image was always even: 28, 32, 64 or 128.
+
+  With this solution we were able to obtain a variable model architecture depending on the size of the image. Since it is a simple MLP, it has been relatively easy to implement such a solution.
+
+  **- Results with the best combination:**
+  **Reduced dataset:**
+
+  **Large dataset (the one used in the CNN)**
+  The values of the val and test error are the results of the low resolution values minus the target (high resolution values). If the model predicts worse than this it means that we are predicting worse than the input values (low resolution). Therefore, the model would not be performing well at all.
+
+  The conclusion we get from the comparison is that the MLP predicts better on the reduced data set than on the large data set, although there is some underfitting in the training of the reduced dataset.
+
+  Not only does it predict better with less data, but in the large data set the estimation of the low resolution value is closer to the target (high resolution values), which are the val and test error.  Hence, the model predicts worse.
+
+  One hypothesis of why it seems to perform better with less data and the same combination of hyperparameters, could be because there is a big difference between the two datasets: 7 GB versus 100 GB. Also, probably, there is too much information and data for an MLP, since it is fully connected.
+
+  It could be that with a little more data in the reduced dataset, the MLP could predict good values for this problem without the need of a very large dataset.
+
+
 
 ## How to to run the code
 ### Data preprocessing
-Instructions for how to use the project, including any command-line options or other configuration settings.
+https://github.com/vmaiol/aidl-final-project/tree/main/Data%20Preparation
 
 ### CNN
-Instructions for how to use the project, including any command-line options or other configuration settings.
+- Link to the CNN with a single variable precipitation
+https://github.com/vmaiol/aidl-final-project/tree/main/CNN
+
+- Link to the CNN with multivariable input.
+https://github.com/vmaiol/aidl-final-project/tree/main/CNN_multi
 
 ### MLP
-Instructions for how to use the project, including any command-line options or other configuration settings.
+https://github.com/vmaiol/aidl-final-project/tree/main/MLP
