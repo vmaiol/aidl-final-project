@@ -62,10 +62,13 @@ The main goal and the proposal of this project is to introduce deep learning tec
 
   **- Improved accuracy:**
   Deep learning models can learn complex relationships between input variables and output variables in a way that traditional statistical models cannot. This can lead to more accurate predictions of future climate patterns and more precise estimates of the impacts of climate change.
+
   **- Large-scale data analysis:**
   Climate models rely on large amounts of data, and deep learning models can process vast amounts of data much faster than traditional statistical models. This can lead to a more efficient analysis of data and faster model development.
+
   **- Nonlinear relationships:**
   Climate models are highly nonlinear, which means that small changes in one variable can have large effects on other variables. Deep learning models can handle these nonlinear relationships better than traditional models, which assume linear relationships between variables.
+
   **- Improved representation of processes:**
   Deep learning models can be used to represent complex physical processes in climate models, such as cloud formation and ocean circulation. This can improve the accuracy of the model by incorporating more detailed information about the processes that drive climate patterns.
 
@@ -100,7 +103,7 @@ The high-resolution dataset consists of a very high quantity of data points in N
 For each of the 50 selected locations of the high-resolution dataset, an area of approximately 500x500 km centred around the location is selected from the low-resolution data and defined as input of the model. This input is used to predict the high-resolution value of precipitation.
 
 For each of the locations the next steps are followed:
-  - The low-resolution data consisting of 500x500 km around the location from ERA5 has been deseasonalized (removed the seasonal cycle to obtain anomalies) and normalized (to equate the different variables with very different values. Then regrid the data from a 25 km resolution to a 2.5 km resolution. The data is stacked together with the elevation data (already at a 2.5 km resolution) with the land-ocean mask into an array of dimensions 8x201x201 of dimensions variable-latitude-longitude.
+  - The low-resolution data consisting of 500x500 km around the location from ERA5 has been deseasonalized (removed the seasonal cycle to obtain anomalies) and normalized (to equate the different variables with very different values). Then regrid the data from a 25 km resolution to a 2.5 km resolution. The data is stacked together with the elevation data (already at a 2.5 km resolution) with the land-ocean mask into an array of dimensions 8x201x201 of dimensions variable-latitude-longitude.
   - A similar process is applied to the high-resolution precipitation time series with deseasonalization and normalization.
   - A random selection of 100 days for each of the years of the time series (both high resolution and low resolution) is stored as one file, one file per day of the year. This selection of 100 days out of the available 365 days of the year helped to contain the size of the dataset.
 
@@ -118,7 +121,7 @@ Due to further computational constraints, the initial 50 points were later reduc
 Github has been used as the main code repository point. The structure and how it has been used have been previously described in point 1.
 
 ### Miniconda
-Miniconda has been used to isolate libraries or package installations required for the development. It has been important for developing in  Google cloud, since a VM (Virtual Machine) has been shared for the deployments between us.It also provides a quick start-up when sharing code if it is well-prepared with the requirements to be installed.
+Miniconda has been used to isolate libraries or package installations required for the development. It has been important for developing in  Google cloud, since a VM (Virtual Machine) has been shared for the deployments between us. It also provides a quick start-up when sharing code if it is well-prepared with the requirements to be installed.
 
 ### Google Cloud
 Google cloud has been a constant problem. We won't focus on the time we spent and invested to get the VM up and running, but we wasted a lot of time and it complicated things a lot.
@@ -126,7 +129,7 @@ Google cloud has been a constant problem. We won't focus on the time we spent an
 Apart from this, we were able to create a VM on a personal Google account to work on the project. With the large volume of datasets we had (+100GB), it was quite key for us to be able to use Google Cloud. We created a VM with a fixed IP (to be able to connect via SSH to the same point always) and with the following features:
 - 2 CPUs, 13RAM, 1GPU (NVIDIA T4 or NVIDIA P100) and 200GB Hard disk
 
-The training took forever and was often interrupted, so we had to make use of a private server of the work of one of us to train the model and get some results. It is true that we have been able to do a experiment related to the hyperparameter tuning on Google Cloud (explained in the “extra” section), but with a very reduced dataset (6000 files and around 7GB in total) and a more expensive VM hardware configuration that was not an option for the CNN training because of the prices and long training.
+The training took forever and was often interrupted, so we had to make use of a private server of the work of one of us to train the model and get some results. It is true that we have been able to do a experiment related to the hyperparameter tuning on Google Cloud (explained in the “Additional experiments and developments” section), but with a very reduced dataset (6000 files and around 7GB in total) and a more expensive VM hardware configuration that was not an option for the CNN training because of the prices and long training.
 
 ### Google colab
 It was mainly used in the first tests and trials, as it provides a quick way to execute code, share it and see the results. If our Dataset had been smaller we would probably have focused more on using it.
@@ -204,7 +207,7 @@ The main conclusions from this work can be summarized as:
 ## Additional experiments and developments
 An extra MLP has been developed to see its performance with the same problem. In addition, we have taken advantage of its simple architecture to develop a hyperparameter tuning with Ray Tune. It has been trained with just one variable, precipitation.
 
-Since we were dealing with a regression problem, we had to avoid using a non-linear activation function in the output of the last layer in order to obtain the "real" value of the prediction. In the hidden layers a ReLU has been used since it does not affect the positive values but for the negative ones by changing them to 0. Probably we could have also used it in the last layer (output), but we think that it would not have made a difference.
+Since we were dealing with a regression problem, we had to avoid using a non-linear activation function in the output of the last layer in order to obtain the "real" value of the prediction. In the hidden layers a ReLU has been used since it does not affect the positive values but for the negative ones by changing them to 0.
 
 **- Hyperparameter tuning with Ray Tune.**
 
@@ -218,6 +221,9 @@ Using hyperparameter tuning is very useful when we have many possibilities of hy
 During the training and validation, we’ll send to Ray Tune the results we are obtaining for each combination. Then, we will “ask” Ray Tune which combination should be the best related to the value of the metric. For example, the best combination of hyperparameters for the lowest validation loss. After this, when we have the best combination, we’ll just have to test it as usual, with unseen data.
 
 We applied a grid search and a random search to obtain the best combination of hyperparameters. We have done these experiments in a reduced dataset: 6000 files and 7GB approx. Some good results were obtained:
+
+![Hypothetically best combination of hyperparameters performance in train and validation](./imgs/final_report/plot_train_val.png)
+*Hypothetically best combination of hyperparameters performance in train and validation*
 
 Seems that is underfitting a bit, but good enough to have an intuition of the best combination among the others.
 
@@ -238,14 +244,14 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
 
   An MSELoss has also been used.
 
-  Then, when we wanted to apply the hyperparameter tuning, one of these parameters was the size of the "image" (matrix). As a consequence, the inputs and outputs of the hidden layers are affected because they should be variable to this size. At least for the first layer.
+  Since we considered that one of these hyperparameters was the size of the "image" (matrix), the inputs and outputs of the hidden layers were affected because they should be variable to this size. At least for the first layer.
 
   To solve this and to be able to have a "quite" variable architecture depending on the size of the tensor that was going to receive the model, we created a function to define the inputs and outputs of each layer, as well as the number of layers that the model was going to have. Briefly, it has been developed as follows:
-  - The function receives the tensor (image) and multiplies width x height x dimensions (it was always 1 dimension, precipitation).
+  - The function receives the tensor (image) and multiplies width x height x dimensions (dimension was always 1, precipitation).
   - In a loop, the resultant value of width x height x dimensions was divided by 2 to obtain the input size of the next layer.
   - Each iteration was one layer more.
   - If the value divided by 2 was less than 16, it was not done and was assigned a size of 16. Mainly because the last layer received 16 as input size and as output 1. 1 because we want to get the "real" value predicted and without modification of any activation function.
-  - All this was saved in a dict that was used in the init of the model to create a MLP Sequential.
+  - All this was saved in a dict that was used in the init of the model class to create a Sequential MLP.
   - The size of the image was always even: 28, 32, 64 or 128.
 
   With this solution we were able to obtain a variable model architecture depending on the size of the image. Since it is a simple MLP, it has been relatively easy to implement such a solution.
@@ -274,7 +280,7 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
 
   Not only does it predict better with less data, but in the large dataset the estimation of the low resolution value is closer to the target (high resolution values), which are the val and test error.  Hence, the model predicts worse.
 
-  One hypothesis of why it seems to perform better with less data and the same combination of hyperparameters, could be because there is a big difference between the two datasets: 7 GB versus 100 GB. Also, probably, there is too much information and data for an MLP, since it is fully connected.
+  One hypothesis of why it seems to perform better with less data and the same combination of hyperparameters, could be because there is a big difference between the two datasets: 7 GB versus 100 GB. Also, probably, there is too much information and data for an MLP, since it is fully connected layers.
 
   It could be that with a little more data in the reduced dataset, the MLP could predict good values for this problem without the need of a very large dataset.
 
