@@ -206,7 +206,8 @@ An extra MLP has been developed to see its performance with the same problem. In
 
 Since we were dealing with a regression problem, we had to avoid using a non-linear activation function in the output of the last layer in order to obtain the "real" value of the prediction. In the hidden layers a ReLU has been used since it does not affect the positive values but for the negative ones by changing them to 0. Probably we could have also used it in the last layer (output), but we think that it would not have made a difference.
 
- - Hyperparameter tuning with Ray Tune.
+**- Hyperparameter tuning with Ray Tune.**
+
 Ray Tune is a Python library to implement hyperparameter tuning, which helps to obtain the best possible combination of hyperparameters for our AI algorithm.
 
 Using hyperparameter tuning is very useful when we have many possibilities of hyperparameter combinations and even a wide range of values between some of them. Automating this process helps a lot in terms of results and time, and this is achieved by defining a configuration search space of hyperparameters to be tested. For example:
@@ -231,6 +232,7 @@ Some other results in this link:
 https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNING_RAY_TUNE.pdf
 
   **- MLP architecture:**
+
   The architecture of the MLP model has some aspects to take into account.
   First, as we have already commented, we were dealing with a regression problem, so we had to avoid using a non-linear activation function in the output of the last layer. For the hidden layers a ReLUs has been used since it does not affect the positive values but for the negative ones by changing them to 0. Probably we could have also used it in the last layer (output), but we think that it would not have made any important effect.
 
@@ -249,6 +251,7 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
   With this solution we were able to obtain a variable model architecture depending on the size of the image. Since it is a simple MLP, it has been relatively easy to implement such a solution.
 
   **- Results with the best combination:**
+  
   **Reduced dataset:**
   ![MSE results for various models](./imgs/final_report/plot_train_val_six_k_files.png)
   *Train and validation in the reduced dataset*
