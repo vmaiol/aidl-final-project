@@ -251,8 +251,9 @@ https://github.com/vmaiol/aidl-final-project/blob/main/MLP/results_HYPERPRM_TUNI
   With this solution we were able to obtain a variable model architecture depending on the size of the image. Since it is a simple MLP, it has been relatively easy to implement such a solution.
 
   **- Results with the best combination:**
+
   The model has been tested on two datasets.
-   
+
   **Reduced dataset:**
   ![MSE results for various models](./imgs/final_report/plot_train_val_six_k_files.png)
   *Train and validation in the reduced dataset*
